@@ -143,6 +143,8 @@ void AtomAutofillClient::UpdateAutofillPopupDataListValues(
   for (auto i = labels.begin(); i != labels.end(); ++i) {
     LOG(ERROR) << *i;
   }
+  FOR_EACH_OBSERVER(AutofillObserver, observers_,
+                    onUpdateAutofillPopupDataListValues(values, labels));
 }
 
 void AtomAutofillClient::HideAutofillPopup() {

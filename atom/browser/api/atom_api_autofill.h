@@ -6,6 +6,7 @@
 #define ATOM_BROWSER_API_ATOM_API_AUTOFILL_H_
 
 #include <string>
+#include <vector>
 
 #include "atom/browser/autofill/autofill_observer.h"
 #include "atom/browser/api/event_emitter.h"
@@ -48,6 +49,9 @@ class Autofill : public mate::TrackableObject<Autofill>,
   // AutofillObserver:
   void onShowAutofillSettings() override;
   void onHideAutofillPopup() override;
+  void onUpdateAutofillPopupDataListValues(
+    const std::vector<base::string16>& values,
+    const std::vector<base::string16>& labels) override;
 
   brave::BraveBrowserContext* browser_context() {
     return static_cast<brave::BraveBrowserContext*>(browser_context_);

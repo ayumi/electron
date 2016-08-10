@@ -5,6 +5,8 @@
 #ifndef ATOM_BROWSER_AUTOFILL_AUTOFILL_OBSERVER_H_
 #define ATOM_BROWSER_AUTOFILL_AUTOFILL_OBSERVER_H_
 
+#include "base/strings/string16.h"
+
 namespace autofill {
 
 class AutofillObserver {
@@ -12,6 +14,9 @@ class AutofillObserver {
 
   virtual void onShowAutofillSettings() {}
   virtual void onHideAutofillPopup() {}
+  virtual void onUpdateAutofillPopupDataListValues(
+    const std::vector<base::string16>& values,
+    const std::vector<base::string16>& labels) {}
 
  protected:
   virtual ~AutofillObserver() {}

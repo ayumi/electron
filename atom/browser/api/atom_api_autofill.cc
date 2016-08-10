@@ -4,6 +4,7 @@
 
 #include "atom/browser/api/atom_api_autofill.h"
 
+#include "atom/common/native_mate_converters/string16_converter.h"
 #include "atom/common/native_mate_converters/value_converter.h"
 #include "base/values.h"
 #include "content/public/browser/browser_thread.h"
@@ -55,8 +56,14 @@ void Autofill::onShowAutofillSettings() {
 }
 
 void Autofill::onHideAutofillPopup() {
-  Emit("on-hide-autofill-popup");
+  Emit("hide-autofill-popup");
   LOG(ERROR) << __PRETTY_FUNCTION__;
+}
+
+void Autofill::onUpdateAutofillPopupDataListValues(
+    const std::vector<base::string16>& values,
+    const std::vector<base::string16>& labels) {
+ Emit("update-autofill-popup-data-list-values", values, labels);
 }
 
 void Autofill::SetAutofillEnable(bool enable) {
