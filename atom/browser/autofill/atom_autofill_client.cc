@@ -12,11 +12,14 @@
 #include "base/memory/ptr_util.h"
 #include "build/build_config.h"
 #include "chrome/browser/profiles/incognito_helpers.h"
+#include "components/autofill/content/browser/content_autofill_driver.h"
+#include "components/autofill/content/browser/content_autofill_driver_factory.h"
 #include "components/autofill/core/browser/webdata/autofill_webdata_service.h"
 #include "components/autofill/core/common/autofill_pref_names.h"
 #include "components/prefs/pref_service.h"
 #include "components/user_prefs/user_prefs.h"
 #include "content/public/browser/browser_context.h"
+#include "content/public/browser/render_frame_host.h"
 
 DEFINE_WEB_CONTENTS_USER_DATA_KEY(autofill::AtomAutofillClient);
 
@@ -120,7 +123,6 @@ bool AtomAutofillClient::HasCreditCardScanFeature() {
 
 void AtomAutofillClient::ScanCreditCard(
     const CreditCardScanCallback& callback) {
-  LOG(ERROR) << __PRETTY_FUNCTION__;
 }
 
 void AtomAutofillClient::ShowAutofillPopup(
@@ -175,17 +177,28 @@ bool AtomAutofillClient::IsAutocompleteEnabled() {
 void AtomAutofillClient::PropagateAutofillPredictions(
     content::RenderFrameHost* rfh,
     const std::vector<autofill::FormStructure*>& forms) {
-  LOG(ERROR) << __PRETTY_FUNCTION__;
 }
 
 void AtomAutofillClient::DidFillOrPreviewField(
     const base::string16& autofilled_value,
     const base::string16& profile_full_name) {
-  LOG(ERROR) << __PRETTY_FUNCTION__;
 }
 
 void AtomAutofillClient::OnFirstUserGestureObserved() {
   LOG(ERROR) << __PRETTY_FUNCTION__;
+  ContentAutofillDriverFactory* factory =
+    ContentAutofillDriverFactory::FromWebContents(web_contents());
+  DCHECK(factory);
+
+  for (content::RenderFrameHost* frame : web_contents()->GetAllFrames()) {
+    // No need to notify non-live frames.
+    // And actually they have no corresponding drivers in the factory's map.
+    if (!frame->IsRenderFrameLive())
+      continue;
+    ContentAutofillDriver* driver = factory->DriverForFrame(frame);
+    DCHECK(driver);
+    driver->NotifyFirstUserGestureObservedInTab();
+  }
 }
 
 bool AtomAutofillClient::IsContextSecure(const GURL& form_origin) {
