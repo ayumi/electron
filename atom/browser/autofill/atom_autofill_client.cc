@@ -80,31 +80,38 @@ rappor::RapporService* AtomAutofillClient::GetRapporService() {
 }
 
 void AtomAutofillClient::ShowAutofillSettings() {
+  LOG(ERROR) << __PRETTY_FUNCTION__;
+  FOR_EACH_OBSERVER(AutofillObserver, observers_, onShowAutofillSettings());
 }
 
 void AtomAutofillClient::ShowUnmaskPrompt(
     const CreditCard& card,
     UnmaskCardReason reason,
     base::WeakPtr<CardUnmaskDelegate> delegate) {
+  LOG(ERROR) << __PRETTY_FUNCTION__;
 }
 
 void AtomAutofillClient::OnUnmaskVerificationResult(
     PaymentsRpcResult result) {
+  LOG(ERROR) << __PRETTY_FUNCTION__;
 }
 
 void AtomAutofillClient::ConfirmSaveCreditCardLocally(
     const CreditCard& card,
     const base::Closure& callback) {
+  LOG(ERROR) << __PRETTY_FUNCTION__;
 }
 
 void AtomAutofillClient::ConfirmSaveCreditCardToCloud(
     const CreditCard& card,
     std::unique_ptr<base::DictionaryValue> legal_message,
     const base::Closure& callback) {
+  LOG(ERROR) << __PRETTY_FUNCTION__;
 }
 
 void AtomAutofillClient::LoadRiskData(
     const base::Callback<void(const std::string&)>& callback) {
+  LOG(ERROR) << __PRETTY_FUNCTION__;
 }
 
 bool AtomAutofillClient::HasCreditCardScanFeature() {
@@ -113,6 +120,7 @@ bool AtomAutofillClient::HasCreditCardScanFeature() {
 
 void AtomAutofillClient::ScanCreditCard(
     const CreditCardScanCallback& callback) {
+  LOG(ERROR) << __PRETTY_FUNCTION__;
 }
 
 void AtomAutofillClient::ShowAutofillPopup(
@@ -120,19 +128,33 @@ void AtomAutofillClient::ShowAutofillPopup(
     base::i18n::TextDirection text_direction,
     const std::vector<autofill::Suggestion>& suggestions,
     base::WeakPtr<AutofillPopupDelegate> delegate) {
+  LOG(ERROR) << __PRETTY_FUNCTION__;
 }
 
 void AtomAutofillClient::UpdateAutofillPopupDataListValues(
     const std::vector<base::string16>& values,
     const std::vector<base::string16>& labels) {
+  LOG(ERROR) << __PRETTY_FUNCTION__;
+  LOG(ERROR) << values.size();
+  for (auto i = values.begin(); i != values.end(); ++i) {
+    LOG(ERROR) << *i;
+  }
+  LOG(ERROR) << labels.size();
+  for (auto i = labels.begin(); i != labels.end(); ++i) {
+    LOG(ERROR) << *i;
+  }
 }
 
 void AtomAutofillClient::HideAutofillPopup() {
+  LOG(ERROR) << __PRETTY_FUNCTION__;
+  FOR_EACH_OBSERVER(AutofillObserver, observers_, onHideAutofillPopup());
 }
 
 bool AtomAutofillClient::IsAutocompleteEnabled() {
+  LOG(ERROR) << __PRETTY_FUNCTION__ << GetPrefs()->GetBoolean(prefs::kAutofillEnabled);
   // For browser, Autocomplete is always enabled as part of Autofill.
-  return GetPrefs()->GetBoolean(prefs::kAutofillEnabled);
+  //return GetPrefs()->GetBoolean(prefs::kAutofillEnabled);
+  return true;
 }
 
 // void AtomAutofillClient::MainFrameWasResized(bool width_changed) {
@@ -151,17 +173,21 @@ bool AtomAutofillClient::IsAutocompleteEnabled() {
 void AtomAutofillClient::PropagateAutofillPredictions(
     content::RenderFrameHost* rfh,
     const std::vector<autofill::FormStructure*>& forms) {
+  LOG(ERROR) << __PRETTY_FUNCTION__;
 }
 
 void AtomAutofillClient::DidFillOrPreviewField(
     const base::string16& autofilled_value,
     const base::string16& profile_full_name) {
+  LOG(ERROR) << __PRETTY_FUNCTION__;
 }
 
 void AtomAutofillClient::OnFirstUserGestureObserved() {
+  LOG(ERROR) << __PRETTY_FUNCTION__;
 }
 
 bool AtomAutofillClient::IsContextSecure(const GURL& form_origin) {
+  LOG(ERROR) << __PRETTY_FUNCTION__;
   return false;
 }
 

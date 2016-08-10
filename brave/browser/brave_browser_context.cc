@@ -10,6 +10,7 @@
 #include "chrome/browser/custom_handlers/protocol_handler_registry.h"
 #include "chrome/browser/custom_handlers/protocol_handler_registry_factory.h"
 #include "chrome/common/pref_names.h"
+#include "components/autofill/core/browser/autofill_manager.h"
 #include "components/keyed_service/content/browser_context_dependency_manager.h"
 #include "components/prefs/json_pref_store.h"
 #include "components/prefs/pref_change_registrar.h"
@@ -283,6 +284,7 @@ void BraveBrowserContext::RegisterPrefs(PrefRegistrySimple* pref_registry) {
     // TODO(bridiver) - is this necessary or is it covered by
     // BrowserContextDependencyManager
     ProtocolHandlerRegistry::RegisterProfilePrefs(pref_registry_.get());
+    //autofill::AutofillManager::RegisterProfilePrefs(pref_registry_.get());
 #if defined(ENABLE_EXTENSIONS)
     extensions::AtomBrowserClientExtensionsPart::RegisterProfilePrefs(
         pref_registry_.get());

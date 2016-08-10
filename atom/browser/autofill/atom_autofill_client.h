@@ -8,6 +8,7 @@
 #include <memory>
 #include <vector>
 
+#include "atom/browser/autofill/autofill_observer.h"
 #include "base/callback.h"
 #include "base/compiler_specific.h"
 #include "base/i18n/rtl.h"
@@ -29,7 +30,8 @@ class FormStructure;
 class AtomAutofillClient
     : public AutofillClient,
     public content::WebContentsUserData<AtomAutofillClient>,
-    public content::WebContentsObserver {
+    public content::WebContentsObserver,
+    public AutofillObserver {
 public:
   ~AtomAutofillClient() override;
   // AutofillClient:
@@ -72,10 +74,14 @@ public:
   void OnFirstUserGestureObserved() override;
   bool IsContextSecure(const GURL& form_origin) override;
 
+  void AddObserver(AutofillObserver* obs) { observers_.AddObserver(obs); }
+  void RemoveObserver(AutofillObserver* obs) { observers_.RemoveObserver(obs); }
+
  private:
   explicit AtomAutofillClient(content::WebContents* web_contents);
   friend class content::WebContentsUserData<AtomAutofillClient>;
 
+  base::ObserverList<AutofillObserver> observers_;
 
   DISALLOW_COPY_AND_ASSIGN(AtomAutofillClient);
 };

@@ -7,6 +7,7 @@
 #include <string>
 #include <vector>
 
+#include "atom/browser/api/atom_api_autofill.h"
 #include "atom/browser/api/atom_api_cookies.h"
 #include "atom/browser/api/atom_api_download_item.h"
 #include "atom/browser/api/atom_api_protocol.h"
@@ -552,6 +553,14 @@ v8::Local<v8::Value> Session::UserPrefs(v8::Isolate* isolate) {
   return v8::Local<v8::Value>::New(isolate, user_prefs_);
 }
 
+v8::Local<v8::Value> Session::Autofill(v8::Isolate* isolate) {
+  if (autofill_.IsEmpty()) {
+    auto handle = atom::api::Autofill::Create(isolate, browser_context());
+    autofill_.Reset(isolate, handle.ToV8());
+  }
+  return v8::Local<v8::Value>::New(isolate, autofill_);
+}
+
 bool Session::Equal(Session* session) const {
 #if defined(ENABLE_EXTENSIONS)
   return extensions::ExtensionsBrowserClient::Get()->IsSameContext(
@@ -622,7 +631,8 @@ void Session::BuildPrototype(v8::Isolate* isolate,
       .SetProperty("userPrefs", &Session::UserPrefs)
       .SetProperty("cookies", &Session::Cookies)
       .SetProperty("protocol", &Session::Protocol)
-      .SetProperty("webRequest", &Session::WebRequest);
+      .SetProperty("webRequest", &Session::WebRequest)
+      .SetProperty("autofill", &Session::Autofill);
 }
 
 void SetWrapSession(const WrapSessionCallback& callback) {
