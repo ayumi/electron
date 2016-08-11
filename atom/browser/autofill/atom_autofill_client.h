@@ -18,6 +18,11 @@
 #include "content/public/browser/web_contents_observer.h"
 #include "content/public/browser/web_contents_user_data.h"
 
+namespace atom {
+namespace api {
+class WebContents;
+}
+}
 
 namespace content {
 class WebContents;
@@ -35,6 +40,9 @@ class AtomAutofillClient
 public:
   ~AtomAutofillClient() override;
   // AutofillClient:
+  //
+  void Initialize(atom::api::WebContents* api_web_contents);
+
   PersonalDataManager* GetPersonalDataManager() override;
   scoped_refptr<AutofillWebDataService> GetDatabase() override;
   PrefService* GetPrefs() override;
@@ -82,6 +90,8 @@ public:
   friend class content::WebContentsUserData<AtomAutofillClient>;
 
   base::ObserverList<AutofillObserver> observers_;
+
+  atom::api::WebContents* api_web_contents_;
 
   DISALLOW_COPY_AND_ASSIGN(AtomAutofillClient);
 };

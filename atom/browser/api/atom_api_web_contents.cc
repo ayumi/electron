@@ -313,6 +313,9 @@ WebContents::WebContents(v8::Isolate* isolate,
   autofill::AtomAutofillClient::CreateForWebContents(web_contents);
   std::string locale = static_cast<brave::BraveContentBrowserClient*>(
       brave::BraveContentBrowserClient::Get())->GetApplicationLocale();
+  atom_autofill_client_.reset(
+    autofill::AtomAutofillClient::FromWebContents(web_contents));
+  atom_autofill_client_->Initialize(this);
   autofill::ContentAutofillDriverFactory::CreateForWebContentsAndDelegate(
       web_contents,
       autofill::AtomAutofillClient::FromWebContents(web_contents),

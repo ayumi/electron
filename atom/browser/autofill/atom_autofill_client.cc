@@ -6,6 +6,8 @@
 
 #include <utility>
 
+#include "atom/browser/api/atom_api_web_contents.h"
+#include "atom/common/native_mate_converters/string16_converter.h"
 #include "base/bind.h"
 #include "base/command_line.h"
 #include "base/logging.h"
@@ -51,6 +53,10 @@ AtomAutofillClient::AtomAutofillClient(content::WebContents* web_contents)
 AtomAutofillClient::~AtomAutofillClient() {
 }
 
+void AtomAutofillClient::Initialize(atom::api::WebContents* api_web_contents) {
+  api_web_contents_ = api_web_contents;
+}
+
 PersonalDataManager* AtomAutofillClient::GetPersonalDataManager() {
   // content::BrowserContext* browser_context = web_contents()->GetBrowserContext());
   // return PersonalDataManagerFactory::GetForBrowserContext(
@@ -85,7 +91,7 @@ rappor::RapporService* AtomAutofillClient::GetRapporService() {
 
 void AtomAutofillClient::ShowAutofillSettings() {
   LOG(ERROR) << __PRETTY_FUNCTION__;
-  FOR_EACH_OBSERVER(AutofillObserver, observers_, onShowAutofillSettings());
+  api_web_contents_->Emit("show-autofill-settings");
 }
 
 void AtomAutofillClient::ShowUnmaskPrompt(
@@ -146,13 +152,13 @@ void AtomAutofillClient::UpdateAutofillPopupDataListValues(
   for (auto i = labels.begin(); i != labels.end(); ++i) {
     LOG(ERROR) << *i;
   }
-  FOR_EACH_OBSERVER(AutofillObserver, observers_,
-                    onUpdateAutofillPopupDataListValues(values, labels));
+  api_web_contents_->Emit("update-autofill-popup-data-list-values",
+                          values, labels);
 }
 
 void AtomAutofillClient::HideAutofillPopup() {
   LOG(ERROR) << __PRETTY_FUNCTION__;
-  FOR_EACH_OBSERVER(AutofillObserver, observers_, onHideAutofillPopup());
+  api_web_contents_->Emit("hide-autofill-popup");
 }
 
 bool AtomAutofillClient::IsAutocompleteEnabled() {

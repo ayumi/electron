@@ -20,6 +20,10 @@
 #include "native_mate/handle.h"
 #include "ui/gfx/image/image.h"
 
+namespace autofill {
+class AtomAutofillClient;
+}
+
 namespace blink {
 struct WebDeviceEmulationParams;
 }
@@ -396,6 +400,8 @@ class WebContents : public mate::TrackableObject<WebContents>,
   v8::Global<v8::Value> debugger_;
 
   std::unique_ptr<WebViewGuestDelegate> guest_delegate_;
+
+  std::unique_ptr<autofill::AtomAutofillClient> atom_autofill_client_;
 
   // The host webcontents that may contain this webcontents.
   WebContents* embedder_;
