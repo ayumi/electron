@@ -164,8 +164,7 @@ void AtomAutofillClient::HideAutofillPopup() {
 bool AtomAutofillClient::IsAutocompleteEnabled() {
   LOG(ERROR) << __PRETTY_FUNCTION__ << GetPrefs()->GetBoolean(prefs::kAutofillEnabled);
   // For browser, Autocomplete is always enabled as part of Autofill.
-  //return GetPrefs()->GetBoolean(prefs::kAutofillEnabled);
-  return true;
+  return GetPrefs()->GetBoolean(prefs::kAutofillEnabled);
 }
 
 // void AtomAutofillClient::MainFrameWasResized(bool width_changed) {

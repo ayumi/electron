@@ -6,10 +6,7 @@
 #define ATOM_BROWSER_API_ATOM_API_AUTOFILL_H_
 
 #include <string>
-#include <vector>
 
-#include "atom/browser/autofill/autofill_observer.h"
-#include "atom/browser/api/event_emitter.h"
 #include "atom/browser/api/trackable_object.h"
 #include "base/callback.h"
 #include "brave/browser/brave_browser_context.h"
@@ -28,8 +25,7 @@ namespace atom {
 
 namespace api {
 
-class Autofill : public mate::TrackableObject<Autofill>,
-                 public autofill::AutofillObserver {
+class Autofill : public mate::TrackableObject<Autofill> {
  public:
   static mate::Handle<Autofill> Create(v8::Isolate* isolate,
                                   content::BrowserContext* browser_context);
@@ -42,16 +38,14 @@ class Autofill : public mate::TrackableObject<Autofill>,
   Autofill(v8::Isolate* isolate, content::BrowserContext* browser_context);
   ~Autofill() override;
 
+  void SetProfile(const base::DictionaryValue& profile);
+  void GetProfile();
+
+  void SetCreditCard();
+  void GetCreditCard();
 
   void SetAutofillEnable(bool enable);
   bool IsAutofillEnable();
-
-  // AutofillObserver:
-  void onShowAutofillSettings() override;
-  void onHideAutofillPopup() override;
-  void onUpdateAutofillPopupDataListValues(
-    const std::vector<base::string16>& values,
-    const std::vector<base::string16>& labels) override;
 
   brave::BraveBrowserContext* browser_context() {
     return static_cast<brave::BraveBrowserContext*>(browser_context_);
