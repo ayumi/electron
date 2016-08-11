@@ -39,10 +39,10 @@ class AtomAutofillClient
     public AutofillObserver {
 public:
   ~AtomAutofillClient() override;
-  // AutofillClient:
-  //
+
   void Initialize(atom::api::WebContents* api_web_contents);
 
+  // AutofillClient:
   PersonalDataManager* GetPersonalDataManager() override;
   scoped_refptr<AutofillWebDataService> GetDatabase() override;
   PrefService* GetPrefs() override;

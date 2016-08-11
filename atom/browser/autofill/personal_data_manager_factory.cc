@@ -4,22 +4,24 @@
 
 #include "atom/browser/autofill/personal_data_manager_factory.h"
 
-#include "atom/browser/web_data_service_factory.h"
+// #include "atom/browser/web_data_service_factory.h"
 #include "base/memory/singleton.h"
+#include "brave/browser/brave_content_browser_client.h"
 #include "chrome/browser/browser_process.h"
 #include "chrome/browser/profiles/incognito_helpers.h"
 #include "chrome/browser/profiles/profile.h"
 #include "components/autofill/core/browser/personal_data_manager.h"
 #include "components/autofill/core/browser/webdata/autofill_webdata_service.h"
 #include "components/keyed_service/content/browser_context_dependency_manager.h"
+#include "components/user_prefs/user_prefs.h"
 
 namespace autofill {
 
 // static
-PersonalDataManager* PersonalDataManagerFactory::GetForProfile(
-    Profile* profile) {
+PersonalDataManager* PersonalDataManagerFactory::GetForBrowserContext(
+    content::BrowserContext* context) {
   return static_cast<PersonalDataManager*>(
-      GetInstance()->GetServiceForBrowserContext(profile, true));
+      GetInstance()->GetServiceForBrowserContext(context, true));
 }
 
 // static
@@ -31,7 +33,7 @@ PersonalDataManagerFactory::PersonalDataManagerFactory()
     : BrowserContextKeyedServiceFactory(
         "PersonalDataManager",
         BrowserContextDependencyManager::GetInstance()) {
-  DependsOn(WebDataServiceFactory::GetInstance());
+  //DependsOn(WebDataServiceFactory::GetInstance());
 }
 
 PersonalDataManagerFactory::~PersonalDataManagerFactory() {
@@ -39,15 +41,15 @@ PersonalDataManagerFactory::~PersonalDataManagerFactory() {
 
 KeyedService* PersonalDataManagerFactory::BuildServiceInstanceFor(
     content::BrowserContext* context) const {
-  Profile* profile = Profile::FromBrowserContext(context);
   PersonalDataManager* service =
-      new PersonalDataManager(g_browser_process->GetApplicationLocale());
-  service->Init(WebDataServiceFactory::GetAutofillWebDataForProfile(
-                    profile, ServiceAccessType::EXPLICIT_ACCESS),
-                profile->GetPrefs(),
-                NULL,
-                NULL,
-                profile->IsOffTheRecord());
+      new PersonalDataManager(
+          brave::BraveContentBrowserClient::Get()->GetApplicationLocale());
+  scoped_refptr<AutofillWebDataService> data_service;
+  service->Init(data_service,
+                user_prefs::UserPrefs::Get(context),
+                nullptr,
+                nullptr,
+                context->IsOffTheRecord());
   return service;
 }
 

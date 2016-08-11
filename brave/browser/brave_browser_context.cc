@@ -284,7 +284,7 @@ void BraveBrowserContext::RegisterPrefs(PrefRegistrySimple* pref_registry) {
     // TODO(bridiver) - is this necessary or is it covered by
     // BrowserContextDependencyManager
     ProtocolHandlerRegistry::RegisterProfilePrefs(pref_registry_.get());
-    //autofill::AutofillManager::RegisterProfilePrefs(pref_registry_.get());
+    autofill::AutofillManager::RegisterProfilePrefs(pref_registry_.get());
 #if defined(ENABLE_EXTENSIONS)
     extensions::AtomBrowserClientExtensionsPart::RegisterProfilePrefs(
         pref_registry_.get());

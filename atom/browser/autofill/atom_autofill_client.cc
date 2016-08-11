@@ -6,6 +6,7 @@
 
 #include <utility>
 
+#include "atom/browser/autofill/personal_data_manager_factory.h"
 #include "atom/browser/api/atom_api_web_contents.h"
 #include "atom/common/native_mate_converters/string16_converter.h"
 #include "base/bind.h"
@@ -58,10 +59,9 @@ void AtomAutofillClient::Initialize(atom::api::WebContents* api_web_contents) {
 }
 
 PersonalDataManager* AtomAutofillClient::GetPersonalDataManager() {
-  // content::BrowserContext* browser_context = web_contents()->GetBrowserContext());
-  // return PersonalDataManagerFactory::GetForBrowserContext(
-  //     return chrome::GetBrowserContextRedirectedInIncognito(context));
-  return nullptr;
+  content::BrowserContext* context = web_contents()->GetBrowserContext();
+  return PersonalDataManagerFactory::GetForBrowserContext(
+        chrome::GetBrowserContextRedirectedInIncognito(context));
 }
 
 scoped_refptr<AutofillWebDataService> AtomAutofillClient::GetDatabase() {
