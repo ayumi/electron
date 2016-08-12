@@ -7,12 +7,14 @@
 #include "atom/browser/autofill/personal_data_manager_factory.h"
 #include "atom/common/native_mate_converters/string16_converter.h"
 #include "atom/common/native_mate_converters/value_converter.h"
+#include "base/guid.h"
 #include "base/strings/utf_string_conversions.h"
 #include "base/values.h"
 #include "brave/browser/brave_content_browser_client.h"
 #include "components/autofill/core/browser/autofill_profile.h"
 #include "components/autofill/core/browser/personal_data_manager.h"
 #include "content/public/browser/browser_thread.h"
+#include "native_mate/dictionary.h"
 
 #include "atom/common/native_mate_converters/v8_value_converter.h"
 
@@ -26,6 +28,94 @@ struct Converter<const base::DictionaryValue*> {
     std::unique_ptr<atom::V8ValueConverter>
         converter(new atom::V8ValueConverter);
     return converter->ToV8Value(val, isolate->GetCurrentContext());
+  }
+};
+
+template<>
+struct Converter<autofill::AutofillProfile*> {
+  static v8::Local<v8::Value> ToV8(
+    v8::Isolate* isolate, autofill::AutofillProfile* val) {
+  mate::Dictionary dict = mate::Dictionary::CreateEmpty(isolate);
+  std::string full_name, company_name, street_address, city, state, locality,
+    postal_code, sorting_code, country_code, phone, email;
+  if (val) {
+    full_name =
+      base::UTF16ToUTF8(val->GetInfo(
+        autofill::AutofillType(autofill::NAME_FULL),
+        brave::BraveContentBrowserClient::Get()
+        ->GetApplicationLocale()));
+    if (!full_name.empty()) {
+      dict.Set("full_name", full_name);
+    }
+
+    company_name =
+      base::UTF16ToUTF8(val->GetRawInfo(autofill::COMPANY_NAME));
+    if (!company_name.empty()) {
+      dict.Set("company_name", company_name);
+    }
+
+    street_address =
+      base::UTF16ToUTF8(val->GetRawInfo(
+        autofill::ADDRESS_HOME_STREET_ADDRESS));
+    if (!street_address.empty()) {
+      dict.Set("street_address", street_address);
+    }
+
+    city =
+      base::UTF16ToUTF8(val->GetRawInfo(
+        autofill::ADDRESS_HOME_CITY));
+    if (!city.empty()) {
+      dict.Set("city", city);
+    }
+
+    state =
+      base::UTF16ToUTF8(val->GetRawInfo(
+        autofill::ADDRESS_HOME_STATE));
+    if (!state.empty()) {
+      dict.Set("state", state);
+    }
+
+    locality =
+      base::UTF16ToUTF8(val->GetRawInfo(
+        autofill::ADDRESS_HOME_DEPENDENT_LOCALITY));
+    if (!locality.empty()) {
+      dict.Set("locality", locality);
+    }
+
+    postal_code =
+      base::UTF16ToUTF8(val->GetRawInfo(autofill::ADDRESS_HOME_ZIP));
+    if (!postal_code.empty()) {
+      dict.Set("postal_code", postal_code);
+    }
+
+    sorting_code =
+      base::UTF16ToUTF8(val->GetRawInfo(
+        autofill::ADDRESS_HOME_SORTING_CODE));
+    if (!sorting_code.empty()) {
+      dict.Set("sorting_code", sorting_code);
+    }
+
+    country_code =
+      base::UTF16ToUTF8(val->GetRawInfo(
+        autofill::ADDRESS_HOME_COUNTRY));
+    if (!country_code.empty()) {
+      dict.Set("country_code", country_code);
+    }
+
+    phone =
+      base::UTF16ToUTF8(val->GetRawInfo(
+        autofill::PHONE_HOME_WHOLE_NUMBER));
+    if (!phone.empty()) {
+      dict.Set("phone", phone);
+    }
+
+    email =
+      base::UTF16ToUTF8(val->GetRawInfo(autofill::EMAIL_ADDRESS));
+    if (!email.empty()) {
+      dict.Set("email", email);
+    }
+  }
+  return dict.GetHandle();
   }
 };
 
@@ -46,6 +136,8 @@ namespace atom {
 
 namespace api {
 
+static const char kSettingsOrigin[] = "Autofill settings";
+
 Autofill::Autofill(v8::Isolate* isolate,
                  content::BrowserContext* browser_context)
       : browser_context_(browser_context) {
@@ -55,7 +147,7 @@ Autofill::Autofill(v8::Isolate* isolate,
 Autofill::~Autofill() {
 }
 
-void Autofill::SetProfile(const base::DictionaryValue& profile) {
+std::string Autofill::AddProfile(const base::DictionaryValue& profile) {
   std::string full_name, company_name, street_address, city, state, locality,
     postal_code, sorting_code, country_code, phone, email, language_code;
   profile.GetString("full_name", &full_name);
@@ -73,13 +165,13 @@ void Autofill::SetProfile(const base::DictionaryValue& profile) {
   autofill::PersonalDataManager* personal_data =
       autofill::PersonalDataManagerFactory::GetForBrowserContext(
       browser_context_);
-  //if (!personal_data || !personal_data->IsDataLoaded()) {
   if (!personal_data) {
     LOG(ERROR) << "No Data";
-    return;
+    return std::string();
   }
 
-  autofill::AutofillProfile autofill_profile;
+  std::string guid = base::GenerateGUID();
+  autofill::AutofillProfile autofill_profile(guid, kSettingsOrigin);
   if (!full_name.empty()) {
     autofill_profile.SetInfo(autofill::AutofillType(autofill::NAME_FULL),
                     base::UTF8ToUTF16(full_name),
@@ -149,10 +241,36 @@ void Autofill::SetProfile(const base::DictionaryValue& profile) {
 
   LOG(ERROR) << autofill_profile;
   personal_data->AddProfile(autofill_profile);
-}
-void Autofill::GetProfile() {}
 
-void Autofill::SetCreditCard() {}
+  return guid;
+}
+
+autofill::AutofillProfile* Autofill::GetProfile(std::string guid) {
+  autofill::PersonalDataManager* personal_data =
+      autofill::PersonalDataManagerFactory::GetForBrowserContext(
+      browser_context_);
+  if (!personal_data) {
+    LOG(ERROR) << "No Data";
+    return nullptr;
+  }
+
+  return personal_data->GetProfileByGUID(guid);
+}
+
+bool Autofill::RemoveProfile(const std::string guid) {
+  autofill::PersonalDataManager* personal_data =
+      autofill::PersonalDataManagerFactory::GetForBrowserContext(
+      browser_context_);
+  if (!personal_data) {
+    LOG(ERROR) << "No Data";
+    return false;
+  }
+
+  personal_data->RemoveByGUID(guid);
+  return true;
+}
+
+void Autofill::AddCreditCard() {}
 void Autofill::GetCreditCard() {}
 
 
@@ -178,9 +296,10 @@ void Autofill::BuildPrototype(v8::Isolate* isolate,
   mate::ObjectTemplateBuilder(isolate, prototype)
   .SetMethod("setAutofillEnable", &Autofill::SetAutofillEnable)
   .SetMethod("isAutofillEnable", &Autofill::IsAutofillEnable)
-  .SetMethod("setProfile", &Autofill::SetProfile)
+  .SetMethod("addProfile", &Autofill::AddProfile)
   .SetMethod("getProfile", &Autofill::GetProfile)
-  .SetMethod("setCreditCard", &Autofill::SetCreditCard)
+  .SetMethod("removeProfile", &Autofill::RemoveProfile)
+  .SetMethod("addCreditCard", &Autofill::AddCreditCard)
   .SetMethod("getCreditCard", &Autofill::GetCreditCard);
 }
 

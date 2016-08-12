@@ -12,6 +12,10 @@
 #include "brave/browser/brave_browser_context.h"
 #include "native_mate/handle.h"
 
+namespace autofill {
+class AutofillProfile;
+}
+
 namespace base {
 class DictionaryValue;
 class ListValue;
@@ -38,10 +42,11 @@ class Autofill : public mate::TrackableObject<Autofill> {
   Autofill(v8::Isolate* isolate, content::BrowserContext* browser_context);
   ~Autofill() override;
 
-  void SetProfile(const base::DictionaryValue& profile);
-  void GetProfile();
+  std::string AddProfile(const base::DictionaryValue& profile);
+  autofill::AutofillProfile* GetProfile(std::string guid);
+  bool RemoveProfile(const std::string guid);
 
-  void SetCreditCard();
+  void AddCreditCard();
   void GetCreditCard();
 
   void SetAutofillEnable(bool enable);
