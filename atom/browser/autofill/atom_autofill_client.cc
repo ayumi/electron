@@ -48,7 +48,8 @@ void SampleDomainAndRegistryFromGURL(RapporService* rappor_service,
 namespace autofill {
 
 AtomAutofillClient::AtomAutofillClient(content::WebContents* web_contents)
-    : content::WebContentsObserver(web_contents) {
+    : content::WebContentsObserver(web_contents),
+      api_web_contents_(nullptr) {
   DCHECK(web_contents);
 }
 
@@ -89,7 +90,9 @@ rappor::RapporService* AtomAutofillClient::GetRapporService() {
 
 void AtomAutofillClient::ShowAutofillSettings() {
   LOG(ERROR) << __PRETTY_FUNCTION__;
-  api_web_contents_->Emit("show-autofill-settings");
+  if (api_web_contents_) {
+    api_web_contents_->Emit("show-autofill-settings");
+  }
 }
 
 void AtomAutofillClient::ShowUnmaskPrompt(
@@ -136,6 +139,8 @@ void AtomAutofillClient::ShowAutofillPopup(
     const std::vector<autofill::Suggestion>& suggestions,
     base::WeakPtr<AutofillPopupDelegate> delegate) {
   LOG(ERROR) << __PRETTY_FUNCTION__;
+  LOG(ERROR) << element_bounds.ToString();
+  LOG(ERROR) << text_direction;
   LOG(ERROR) << suggestions.size();
   for (auto i = suggestions.begin(); i != suggestions.end(); ++i) {
     LOG(ERROR) << i->value;
@@ -156,13 +161,17 @@ void AtomAutofillClient::UpdateAutofillPopupDataListValues(
   for (auto i = labels.begin(); i != labels.end(); ++i) {
     LOG(ERROR) << *i;
   }
-  api_web_contents_->Emit("update-autofill-popup-data-list-values",
-                          values, labels);
+  if (api_web_contents_) {
+    api_web_contents_->Emit("update-autofill-popup-data-list-values",
+                            values, labels);
+  }
 }
 
 void AtomAutofillClient::HideAutofillPopup() {
   LOG(ERROR) << __PRETTY_FUNCTION__;
-  api_web_contents_->Emit("hide-autofill-popup");
+  if (api_web_contents_) {
+    api_web_contents_->Emit("hide-autofill-popup");
+  }
 }
 
 bool AtomAutofillClient::IsAutocompleteEnabled() {

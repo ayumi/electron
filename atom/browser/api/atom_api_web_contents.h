@@ -401,8 +401,6 @@ class WebContents : public mate::TrackableObject<WebContents>,
 
   std::unique_ptr<WebViewGuestDelegate> guest_delegate_;
 
-  std::unique_ptr<autofill::AtomAutofillClient> atom_autofill_client_;
-
   // The host webcontents that may contain this webcontents.
   WebContents* embedder_;
 
