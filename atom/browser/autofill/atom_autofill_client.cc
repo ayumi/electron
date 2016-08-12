@@ -13,6 +13,7 @@
 #include "base/command_line.h"
 #include "base/logging.h"
 #include "base/memory/ptr_util.h"
+#include "brave/browser/brave_browser_context.h"
 #include "build/build_config.h"
 #include "chrome/browser/profiles/incognito_helpers.h"
 #include "components/autofill/content/browser/content_autofill_driver.h"
@@ -65,12 +66,9 @@ PersonalDataManager* AtomAutofillClient::GetPersonalDataManager() {
 }
 
 scoped_refptr<AutofillWebDataService> AtomAutofillClient::GetDatabase() {
-  scoped_refptr<AutofillWebDataService> service;
-  // Profile* profile =
-  //     Profile::FromBrowserContext(web_contents()->GetBrowserContext());
-  // return WebDataServiceFactory::GetAutofillWebDataForProfile(
-  //     profile, ServiceAccessType::EXPLICIT_ACCESS);
-  return service;
+  content::BrowserContext* context = web_contents()->GetBrowserContext();
+  return static_cast<brave::BraveBrowserContext*>(context)
+                ->GetAutofillWebdataService();
 }
 
 PrefService* AtomAutofillClient::GetPrefs() {
@@ -138,6 +136,12 @@ void AtomAutofillClient::ShowAutofillPopup(
     const std::vector<autofill::Suggestion>& suggestions,
     base::WeakPtr<AutofillPopupDelegate> delegate) {
   LOG(ERROR) << __PRETTY_FUNCTION__;
+  LOG(ERROR) << suggestions.size();
+  for (auto i = suggestions.begin(); i != suggestions.end(); ++i) {
+    LOG(ERROR) << i->value;
+    LOG(ERROR) << i->label;
+    LOG(ERROR) << i->icon;
+  }
 }
 
 void AtomAutofillClient::UpdateAutofillPopupDataListValues(

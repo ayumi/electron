@@ -70,8 +70,6 @@ void Autofill::SetProfile(const base::DictionaryValue& profile) {
   profile.GetString("phone", &phone);
   profile.GetString("email", &email);
   profile.GetString("language_code", &language_code);
-  LOG(ERROR) << full_name;
-  LOG(ERROR) << company_name;
   autofill::PersonalDataManager* personal_data =
       autofill::PersonalDataManagerFactory::GetForBrowserContext(
       browser_context_);
