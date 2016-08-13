@@ -493,6 +493,10 @@ Returns the title of the current web page.
 
 Returns a Boolean, whether the web page is focused.
 
+### `contents.isInitialBlankNavigation()`
+
+Returns a boolean whether the web page has not yet committed a navigation.
+
 #### `contents.isLoading()`
 
 Returns whether web page is still loading resources.
